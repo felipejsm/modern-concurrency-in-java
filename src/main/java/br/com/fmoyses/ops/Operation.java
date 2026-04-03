@@ -8,7 +8,7 @@ import br.com.fmoyses.model.Person;
 import java.util.List;
 
 public class Operation {
-    final int MILLISECONDS = 200;
+    final int MILLISECONDS = 2000;
     public Credit calculatedCredit(Long personId) {
         var person = getPerson(personId);
         var assets = getAssets(person);
@@ -17,11 +17,11 @@ public class Operation {
         return calculatedCredits(assets, liabilities);
     }
     Person getPerson(Long personId) {
-        simulateDelay(200);
+        simulateDelay(MILLISECONDS);
         return new Person(personId, "John Doe");
     }
     List<Asset> getAssets(Person person) {
-        simulateDelay(200);
+        simulateDelay(MILLISECONDS);
         return List.of(
                 new Asset("House", 300000),
                 new Asset("Car", 2500)
