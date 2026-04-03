@@ -3,9 +3,6 @@ package br.com.fmoyses;
 import br.com.fmoyses.ops.Operation;
 import br.com.fmoyses.util.ExecutionTimer;
 
-/**
- * Hello world!
- */
 public class App {
     void main() throws Exception {
         Operation op = new Operation();
@@ -20,6 +17,15 @@ public class App {
                     Thread.currentThread().interrupt();
                     throw new RuntimeException(e);
                 }
+        });
+        IO.println("====== Parallel Execution w/ Executors ======");
+        ExecutionTimer.measure(() -> {
+            try{
+                return op.calculateCreditWithExecutor(1L);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(e);
+            }
         });
     }
 }

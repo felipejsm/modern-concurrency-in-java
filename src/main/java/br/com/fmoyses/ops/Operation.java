@@ -6,6 +6,10 @@ import br.com.fmoyses.model.Liability;
 import br.com.fmoyses.model.Person;
 
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class Operation {
@@ -48,6 +52,23 @@ public class Operation {
         t3.join();
         return credit;
 
+    }
+
+    public Credit calculateCreditWithExecutor(Long personId)
+    throws ExecutionException, InterruptedException {
+        try (ExecutorService executor = Executors.newFixedThreadPool(5)) {
+            var person = getPerson(personId);
+
+            var assetsFuture = executor.submit(
+                    () -> getAssets(person)
+            );
+            var liabilitiesFuture = executor.submit(
+                    () -> getLiabilities(person)
+            );
+            executor.submit(this::importantWork);
+            return calculatedCredits(assetsFuture.get(),
+                    liabilitiesFuture.get());
+        }
     }
     Person getPerson(Long personId) {
         simulateDelay(MILLISECONDS);
