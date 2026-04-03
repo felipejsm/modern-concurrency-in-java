@@ -6,6 +6,7 @@ import br.com.fmoyses.model.Liability;
 import br.com.fmoyses.model.Person;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class Operation {
     final int MILLISECONDS = 2000;
@@ -15,6 +16,38 @@ public class Operation {
         var liabilities = getLiabilities(person);
         importantWork();
         return calculatedCredits(assets, liabilities);
+    }
+    public Credit calculatedCreditWIthUnboundedThreads(Long personId)
+        throws InterruptedException {
+        var person = getPerson(personId);
+        var assetsRef = new AtomicReference<List<Asset>>();
+        var t1 = new Thread(
+                () -> {
+                    var assets = getAssets(person);
+                    assetsRef.set(assets);
+                }
+        );
+        var liabilitiesRef = new AtomicReference<List<Liability>>();
+        var t2 = new Thread(
+                () -> {
+                    var liabilities = getLiabilities(person);
+                    liabilitiesRef.set(liabilities);
+                }
+        );
+        var t3 = new Thread(
+                () -> importantWork()
+        );
+        t1.start();
+        t2.start();
+        t3.start();
+
+        t1.join();
+        t2.join();
+
+        var credit = calculatedCredits(assetsRef.get(), liabilitiesRef.get());
+        t3.join();
+        return credit;
+
     }
     Person getPerson(Long personId) {
         simulateDelay(MILLISECONDS);
